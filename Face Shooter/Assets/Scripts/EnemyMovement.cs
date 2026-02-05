@@ -2,31 +2,43 @@ using UnityEngine;
 
 public class EnemyFollow : MonoBehaviour
 {
-    public Transform player;      // Drag your Player object here in the Inspector
+    private Transform player;
     public float moveSpeed = 3f;  
     private Rigidbody2D rb;
-    private Vector2 direction;
+    private Vector2 movement;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        
+        // Automatically find the player by Tag (Make sure Player has "Player" tag)
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null) 
+        {
+            player = playerObj.transform;
+        }
     }
 
     void Update()
     {
         if (player != null)
         {
-            // 1. Calculate the vector pointing from Enemy to Player
-            Vector3 relativePos = player.position - transform.position;
-            
-            // 2. Convert to a unit vector (length of 1) so speed is consistent
-            direction = relativePos.normalized;
+            // Calculate direction
+            Vector2 direction = (player.position - transform.position).normalized;
+            movement = direction;
         }
     }
 
     void FixedUpdate()
     {
-        // 3. Move the Rigidbody toward the player
+        if(player != null)
+        {
+            MoveEnemy(movement);
+        }
+    }
+
+    void MoveEnemy(Vector2 direction)
+    {
         rb.MovePosition(rb.position + direction * moveSpeed * Time.fixedDeltaTime);
     }
 }
